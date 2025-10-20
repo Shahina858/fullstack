@@ -18,7 +18,7 @@ connectDB();
 // );
 app.use(express.json());
 app.use(cors({
-    origin: "https://fullstack-frontend.vercel.app", 
+    origin: "https://fullstack-frontent.vercel.app", 
     methods: ["GET","POST","PUT","DELETE"]
 }));
 

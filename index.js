@@ -13,6 +13,13 @@ connectDB();
 
 // ✅ Middleware
 app.use(express.json());
+<<<<<<< HEAD
+=======
+app.use(cors({
+   origin: "https://fullstack-frontent.vercel.app", 
+    methods: ["GET","POST","PUT","DELETE"]
+}));
+>>>>>>> origin/main
 
 // ✅ CORS setup (correct your domain spelling)
 app.use(

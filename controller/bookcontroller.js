@@ -1,9 +1,9 @@
-const {Book,Cart} = require("../models/books"); // ✅ singular: 'book.js' not 'books.js'
+const { Book, Cart } = require("../models/books"); // ✅ Correct import
 
 // ✅ Get all books
 exports.getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find(); // Fetch all books
+    const books = await Book.find();
     res.status(200).json({
       success: true,
       count: books.length,
@@ -19,7 +19,6 @@ exports.getAllBooks = async (req, res) => {
   }
 };
 
-
 // ✅ Get single book
 exports.getSingleBook = async (req, res) => {
   try {
@@ -33,10 +32,21 @@ exports.getSingleBook = async (req, res) => {
   }
 };
 
-// ✅ Add new book
+// ✅ Add new book (with image support)
 exports.addBook = async (req, res) => {
   try {
-    const newBook = await Book.create(req.body);
+    const { title, author, price, description } = req.body;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+
+    const newBook = new Book({
+      title,
+      author,
+      price,
+      description,
+      image: imagePath,
+    });
+
+    await newBook.save();
     res.status(201).json({ success: true, data: newBook });
   } catch (err) {
     console.error(err);
@@ -44,15 +54,29 @@ exports.addBook = async (req, res) => {
   }
 };
 
-// ✅ Update book
+// ✅ Update book (with image update support)
 exports.updateBook = async (req, res) => {
   try {
-    const updatedBook = await Book.findByIdAndUpdate(req.params.id, req.body, {
+    const { title, author, price, description } = req.body;
+    const imagePath = req.file ? `/uploads/${req.file.filename}` : undefined;
+
+    const updatedData = {
+      title,
+      author,
+      price,
+      description,
+    };
+
+    if (imagePath) updatedData.image = imagePath;
+
+    const updatedBook = await Book.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,
       runValidators: true,
     });
+
     if (!updatedBook)
       return res.status(404).json({ success: false, message: "Book not found" });
+
     res.json({ success: true, data: updatedBook });
   } catch (err) {
     console.error(err);
@@ -74,14 +98,12 @@ exports.deleteBook = async (req, res) => {
   }
 };
 
-
-
 // ----------------- CART CONTROLLERS -----------------
 
-// Get all cart items
+// ✅ Get all cart items
 exports.getCartItems = async (req, res) => {
   try {
-    const items = await Cart.find().populate("book");  //populate Returns cart items with book details fetched from the Book collection
+    const items = await Cart.find().populate("book");
     res.status(200).json({ success: true, data: items });
   } catch (err) {
     console.error(err);
@@ -89,7 +111,7 @@ exports.getCartItems = async (req, res) => {
   }
 };
 
-// Add book to cart
+// ✅ Add book to cart
 exports.addToCart = async (req, res) => {
   try {
     const { bookId } = req.body;
@@ -108,8 +130,7 @@ exports.addToCart = async (req, res) => {
   }
 };
 
-
-// Remove book from cart
+// ✅ Remove book from cart
 exports.removeFromCart = async (req, res) => {
   try {
     const deleted = await Cart.findByIdAndDelete(req.params.id);
